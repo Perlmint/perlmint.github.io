@@ -1,10 +1,10 @@
-﻿language: perl
-before_script:
-- sudo apt-get install latexml
+language: perl
 before_install:
 - perl render.pl
 - mkdir -p .travis
 - openssl aes-256-cbc -K $encrypted_4b7a7054081f_key -iv $encrypted_4b7a7054081f_iv -in deploy_key.pem.enc -out deploy_key.pem -d
+install:
+- cpanm LaTeXML
 script:
 - chmod 600 .travis/deploy_key.pem
 - eval `ssh-agent -s`

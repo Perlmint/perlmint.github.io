@@ -14,9 +14,8 @@ script:
 - git config push.default simple
 - git remote add deploy git@github.com:Perlmint/perlmint.github.io.git
 - git fetch deploy
-- git checkout -b gh-pages deploy/gh-pages
+- git checkout -b gh-pages deploy/gh-pages || git chckout --orphan gh-pages
 - git rm --ignore-unmatch -q -r resume
-- git checkout master -- res
 - find . -name "*.html" -exec git rm --ignore-unmatch -q {} \;
 - mv out/* .
 - rm -rf out

@@ -16,9 +16,8 @@ script:
 - git fetch deploy
 - git checkout -b gh-pages deploy/gh-pages || git checkout --orphan gh-pages
 - git reset
-- git rm --ignore-unmatch -q -r -f resume
-- find . -name "*.html" -exec git rm --ignore-unmatch -q {} \;
+- find . ! -name "out" -exec git rm --ignore-unmatch -q -f {} \;
 - mv out/* .
 - rm -rf out
-- git add resume *.html *.css 
+- git add *
 - if [ `git diff --cached | wc -l` -ne 0 ] ; then  git commit -m"Static page generated" && git push deploy; fi

@@ -5,6 +5,7 @@ before_install:
 install:
 - sudo add-apt-repository ppa:matteosecli/latexml-daily -y
 - sudo apt-get update
+- cpan Archive::Zip DB_File File::Which Getopt::Long Image::Size IO::String JSON::XS LWP MIME::Base64 Parse::RecDescent Pod::Parser Text::Unidecode Test::More URI XML::LibXML XML::LibXSLT UUID::Tiny
 - sudo apt-get install latexml
 script:
 - perl render.pl

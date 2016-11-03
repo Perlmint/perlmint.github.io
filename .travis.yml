@@ -5,7 +5,7 @@ before_install:
 install:
 - sudo add-apt-repository ppa:matteosecli/latexml-daily -y
 - sudo apt-get update
-- sudo install latexml
+- sudo apt-get install latexml
 script:
 - perl render.pl
 - chmod 600 .travis/deploy_key.pem

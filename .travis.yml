@@ -15,7 +15,7 @@ script:
 - git remote add deploy git@github.com:Perlmint/perlmint.github.io.git
 - git fetch deploy
 - git checkout -b gh-pages deploy/gh-pages || git checkout --orphan gh-pages
-- git rm --ignore-unmatch -q -r resume
+- git rm --ignore-unmatch -q -r -f resume
 - find . -name "*.html" -exec git rm --ignore-unmatch -q {} \;
 - mv out/* .
 - rm -rf out

@@ -4,7 +4,7 @@ before_install:
 - mkdir -p .travis
 - openssl aes-256-cbc -K $encrypted_4b7a7054081f_key -iv $encrypted_4b7a7054081f_iv -in deploy_key.pem.enc -out .travis/deploy_key.pem -d
 install:
-- sudo apt-get install install make libarchive-zip-perl libfile-which-perl libimage-size-perl libio-string-perl libjson-xs-perl libtext-unidecode-perl libparse-recdescent-perl liburi-perl libuuid-tiny-perl libwww-perl libxml2 libxml-libxml-perl libxslt1.1 libxml-libxslt-perl texlive-latex-base imagemagick libimage-magick-perl
+- sudo apt-get install make libarchive-zip-perl libfile-which-perl libimage-size-perl libio-string-perl libjson-xs-perl libtext-unidecode-perl libparse-recdescent-perl liburi-perl libuuid-tiny-perl libwww-perl libxml2 libxml-libxml-perl libxslt1.1 libxml-libxslt-perl texlive-latex-base imagemagick libimage-magick-perl
 - sudo cpan Archive::Zip DB_File File::Which Getopt::Long Image::Size IO::String JSON::XS LWP MIME::Base64 Parse::RecDescent Pod::Parser Text::Unidecode Test::More URI XML::LibXML XML::LibXSLT UUID::Tiny
 - sudo cpan LaTeXML
 script:

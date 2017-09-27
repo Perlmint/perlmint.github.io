@@ -1,0 +1,41 @@
+[{
+    "icon": "Cpp",
+    "name": "Cpp"
+  },
+  {
+    "icon": "C",
+    "name": "C"
+  },
+  {
+    "icon": "CSharp",
+    "name": "CSharp"
+  },
+  {
+    "icon": "Typescript",
+    "name": "Typescript"
+  },
+  {
+    "icon": "Webpack",
+    "name": "Webpack"
+  },
+  {
+    "icon": "CMake",
+    "name": "CMake"
+  },
+  {
+    "icon": "Go",
+    "name": "Go"
+  },
+  {
+    "icon": "React",
+    "name": "React"
+  },
+  {
+    "icon": "Python",
+    "name": "Python"
+  },
+  {
+    "icon": "Perl",
+    "name": "Perl"
+  }
+]

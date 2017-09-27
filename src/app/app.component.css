@@ -1,0 +1,22 @@
+md-sidenav-container {
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+}
+
+#menu-nav {
+    width: 240px;
+}
+
+#menu-button {
+    position: absolute;
+    left: 2em;
+    top: 2em;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+}
+
+#content {
+    padding: 4em;
+}

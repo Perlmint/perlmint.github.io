@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Personal",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "icon": {
+                "type": "string"
+            },
+            "content": {
+                "type": "string"
+            },
+            "link": {
+                "type": "string"
+            },
+            "badges": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

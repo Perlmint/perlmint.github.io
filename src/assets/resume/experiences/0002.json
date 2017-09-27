@@ -1,0 +1,22 @@
+{
+    "$schema": "./experience.json",
+    "company": "모빌팩토리",
+    "duration": {
+        "end": "2015-07-01 24:00:00 GMT+09",
+        "start": "2014-04-02 00:00:00 GMT+09"
+    },
+    "next": "0003.json",
+    "projects": [
+        {
+            "id": "mobilfactory-01",
+            "name": "三国飞天",
+            "tags": [
+                "cpp",
+                "csharp",
+                "Thrift",
+                "Boost"
+            ]
+        }
+    ],
+    "title": "소프트웨어 개발자"
+}

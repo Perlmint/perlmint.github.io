@@ -1,0 +1,57 @@
+.box:not(:first-child) {
+    margin-left: .5em;
+}
+.box:not(:last-child) {
+    margin-right: .5em;
+}
+.card:not(:first-child) {
+    margin-top: .5em;
+}
+.card:not(:last-child) {
+    margin-bottom: .5em;
+}
+md-card-title > h2 {
+    margin-top: 0;
+}
+.projects {
+    margin-bottom: .5em;
+}
+.projects > md-accordion {
+    width: 100%;
+}
+.projects > div {
+    height: fit-content !important;
+}
+.card-item {
+    margin-left: 48px;
+}
+.info-item:not(:first-child) {
+    margin-top: .5em;
+}
+.info-item {
+    min-height: 40px;
+}
+.info-item .icon {
+    text-align: center;
+    margin-right: 8px;
+}
+.info-item > * {
+    padding: .5em;
+    vertical-align: middle;
+}
+.info-content {
+    text-align: left;
+}
+.badges {
+    height: 32px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.badges span {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+.badges img {
+    vertical-align: middle;
+}

@@ -1,0 +1,31 @@
+[
+    {
+        "$schema": "./personal-schema.json",
+        "icon": "user",
+        "content": "염규선"
+    },
+    {
+        "icon": "envelope",
+        "content": "omniavinco@gmail.com",
+        "link": "mailto:omniavinco@gmail.com"
+    },
+    {
+        "icon": "home",
+        "content": "대한민국 서울"
+    },
+    {
+        "icon": "github",
+        "content": "Perlmint",
+        "link": "https://github.com/Perlmint"
+    },
+    {
+        "icon": "linkedin",
+        "content": "Perlmint",
+        "link": "https://www.linkedin.com/in/perlmint/"
+    },
+    {
+        "icon": "twitter",
+        "content": "@Perlmint_",
+        "link": "https://twitter.com/Perlmint_"
+    }
+]

@@ -1,0 +1,30 @@
+[
+    {
+        "name": "wand",
+        "url": "https://github.com/dahlia/wand"
+    },
+    {
+        "name": "Mpir.NET",
+        "url": "https://github.com/wezeku/Mpir.NET"
+    },
+    {
+        "name": "GLEW",
+        "url": "https://github.com/nigels-com/glew"
+    },
+    {
+        "name": "UglifyJS2",
+        "url": "https://github.com/mishoo/UglifyJS2"
+    },
+    {
+        "name": "copy-webpack-plugin",
+        "url": "https://github.com/webpack-contrib/copy-webpack-plugin"
+    },
+    {
+        "name": "react-upload-file",
+        "url": "https://github.com/wubocong/react-upload-file"
+    },
+    {
+        "name": "sweetalert",
+        "url": "https://github.com/t4t5/sweetalert"
+    }
+]

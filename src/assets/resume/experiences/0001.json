@@ -1,0 +1,31 @@
+{
+    "$schema": "./experience.json",
+    "company": "사이냅소프트",
+    "duration": {
+        "end": "2014-04-01 24:00:00 GMT+09",
+        "start": "2012-08-01 00:00:00 GMT+09"
+    },
+    "next": "0002.json",
+    "projects": [
+        {
+            "id": "synap-01",
+            "name": "HTML 변환기 2013",
+            "tags": [
+                "cpp",
+                "Javascript",
+                "HTML5",
+                "CMake"
+            ]
+        },
+        {
+            "id": "synap-02",
+            "name": "모바일 오피스 (네이버 모바일 오피스)",
+            "tags": [
+                "cpp",
+                "Protobuf",
+                "CMake"
+            ]
+        }
+    ],
+    "title": "소프트웨어 개발자"
+}

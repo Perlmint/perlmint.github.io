@@ -1,0 +1,20 @@
+{
+    "$schema": "./experience.json",
+    "company": "넥스트플로어",
+    "duration": {
+        "start": "2017-02-01 00:00:00 GMT+09"
+    },
+    "projects": [
+        {
+            "id": "nextfloor-01",
+            "name": "드래곤플라이트 미니",
+            "tags": [
+                "Typescript",
+                "Webpack",
+                "HTML5",
+                "WebGL"
+            ]
+        }
+    ],
+    "title": "소프트웨어 개발자"
+}

@@ -1,0 +1,66 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Experience",
+    "type": "object",
+    "required": [
+        "title",
+        "company",
+        "duration",
+        "projects"
+    ],
+    "properties": {
+        "title": {
+            "type": "string"
+        },
+        "company": {
+            "type": "string"
+        },
+        "duration": {
+            "type": "object",
+            "required": [
+                "start"
+            ],
+            "properties": {
+                "start": {
+                    "type": "string"
+                },
+                "end": {
+                    "type": "string"
+                }
+            }
+        },
+        "projects": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/project"
+            }
+        },
+        "next": {
+            "type": "string"
+        }
+    },
+    "definitions": {
+        "project": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "tags"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

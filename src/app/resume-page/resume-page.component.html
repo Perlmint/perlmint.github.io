@@ -1,0 +1,138 @@
+<div fxLayout="row" fxLayout.xs="column" fxLayout.sm="column" fxFlex>
+  <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="100%" class="box" class.xs="card" class.sm="card">
+    <md-card fxLayout="column">
+      <div *ngFor="let infoItem of info" class="info-item" fxLayout="column">
+        <ng-template #item>
+          <div fxFlex="40px" class="icon">
+            <fa name="{{infoItem.icon}}" size="2x"></fa>
+          </div>
+          <div class="info-content" fxFlex>
+            {{infoItem.content}}
+            <div class="badges" *ngIf="infoItem.badges">
+              <span></span>
+              <ng-template ngFor let-tag [ngForOf]="infoItem.badges">
+                <img [src]="tag | badge" [alt]="tag" width=32 />
+              </ng-template>
+            </div>
+          </div>
+        </ng-template>
+        <ng-container *ngIf="infoItem.link else simpleButton">
+          <a md-button [href]="infoItem.link" target="_blank" fxLayout="row">
+              <ng-container *ngTemplateOutlet="item"></ng-container>
+          </a>
+        </ng-container>
+        <ng-template #simpleButton>
+          <button md-button fxLayout="row">
+            <ng-container *ngTemplateOutlet="item"></ng-container>
+          </button>
+        </ng-template>
+      </div>
+    </md-card>
+  </div>
+  <div fxFlex fxFlex.xs="100%" fxFlex.sm="100%" class="box" class.xs="card" class.sm="card">
+    <md-card class="card">
+      <md-card-header>
+          <div md-card-avatar>
+            <fa name="suitcase" size="2x"></fa>
+          </div>
+          <md-card-title>
+            <h2 i18n>Work Experience</h2>
+          </md-card-title>
+      </md-card-header>
+      <md-card-content>
+        <ng-template ngFor let-exp [ngForOf]="experiences | reverse" let-i="index">
+          <div class="card-item">
+            <md-divider *ngIf="i != 0"></md-divider>
+            <h3>
+              {{exp.title}} @{{exp.company}}<br/>
+              <small>{{exp.duration.start | date:"yyyy-MM" | uppercase}} ~ {{exp.duration.end | date:"yyyy-MM" | uppercase | default:"Now"}}</small>
+            </h3>
+            <div class="projects">
+              <md-accordion>
+                <md-expansion-panel *ngFor="let project of exp.projects" hideToggle=true>
+                    <md-expansion-panel-header>
+                      <md-panel-title>
+                        <h4>{{project.name}}</h4>
+                      </md-panel-title>
+                    </md-expansion-panel-header>
+                    <markdown [innerText]="project.desc"></markdown>
+                    <div class="badges">
+                      <span></span>
+                      <ng-template ngFor let-tag [ngForOf]="project.tags">
+                        <img [src]="tag | badge" [alt]="tag" width=32 />
+                      </ng-template>
+                    </div>
+                </md-expansion-panel>
+              </md-accordion>
+            </div>
+          </div>
+        </ng-template>
+      </md-card-content>
+    </md-card>
+    <md-card class="card">
+      <md-card-header>
+          <div md-card-avatar>
+            <fa name="graduation-cap" size="2x"></fa>
+          </div>
+          <md-card-title>
+            <h2 i18n>Education</h2>
+          </md-card-title>
+      </md-card-header>
+      <md-card-content>
+      </md-card-content>
+    </md-card>
+    <md-card class="card">
+      <md-card-header>
+          <div md-card-avatar>
+            <fa name="cogs" size="2x"></fa>
+          </div>
+          <md-card-title>
+            <h2 i18n>Skills</h2>
+          </md-card-title>
+      </md-card-header>
+      <md-card-content>
+        <div class="badges card-item">
+          <span></span>
+          <ng-template ngFor let-skill [ngForOf]="skills">
+            <img [src]="skill.icon | badge" [alt]="skill.icon" width=32 />
+          </ng-template>
+        </div>
+      </md-card-content>
+    </md-card>
+    <md-card class="card">
+      <md-card-header>
+          <div md-card-avatar>
+            <fa name="language" size="2x"></fa>
+          </div>
+          <md-card-title>
+            <h2 i18n>Languages</h2>
+          </md-card-title>
+      </md-card-header>
+      <md-card-content>
+        <div class="card-item">
+
+        </div>
+      </md-card-content>
+    </md-card>
+    <md-card class="card">
+      <md-card-header>
+          <div md-card-avatar>
+            <fa name="code-fork" size="2x"></fa>
+          </div>
+          <md-card-title>
+            <h2 i18n>Opensource Contribution</h2>
+          </md-card-title>
+      </md-card-header>
+      <md-card-content>
+        <div class="card-item">
+          <md-grid-list cols="4" rowHeight="100px">
+              <md-grid-tile
+                  *ngFor="let contrib of opensources">
+                <a [href]="contrib.url">{{contrib.name}}</a>
+              </md-grid-tile>
+            </md-grid-list>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+</div>

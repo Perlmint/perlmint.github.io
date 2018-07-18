@@ -252,12 +252,56 @@ GPA: 3.42/4.5
   \xjp{Nextfloor}
 }
 2017.2\textasciitilde
+\subsubsection{
+  \xkr{드래곤 플라이트 미니}
+}
+\begin{xkr}
+  HTML5 비행 슈팅 미니게임
+\end{xkr}
+
+\begin{xkr}
+  typescript, Phaser, webpack을 사용하여 개발한 게임이다. 기존에 javascript로 개발되고 있던 프로젝트를 개발 용이성을 높이기 위하여 typescript로 포팅, 리소스 및 모듈화를 적용하기 위하여 webpack을 사용하는 프로젝트로 변환하였다.
+\end{xkr}
+
+\subsubsection{
+  \xkr{소녀와 디저트}
+}
+\begin{xkr}
+  HTML5 3매치 퍼즐 게임
+\end{xkr}
+
+\begin{xkr}
+  typescript, Phaser, webpack을 사용하여 개발한 게임이다. 기존에 javascript로 개발되고 있던 프로젝트를 개발 용이성을 높이기 위하여 typescript로 포팅, 리소스 및 모듈화를 적용하기 위하여 webpack을 사용하는 프로젝트로 변환하였다.
+\end{xkr}
+
+\subsubsection{
+  \xkr{드래곤플라이트 HF}
+}
+\begin{xkr}
+  HTML5 비행 슈팅게임
+\end{xkr}
+
+\begin{xkr}
+  typescript, PIXI.js, webpack을 사용하여 개발한 게임이다. 기존에 개발했던 게임들에서 사용했던 Phaser엔진의 성능에 문제가 발생하는 설계 문제와 성능 개선이 된 렌더링 엔진으로 버전 갱신이 안되어서 게임 엔진이 아닌 렌더링 엔진인 PIXI.js를 사용하여 게임에 필요한 로직을 처음부터 게임에 맞춰서 새로 구현했다. 이전의 프로젝트에 비해서 복잡하고 커진 규모로 인하여 많은 부분에서 리소스를 동적으로 로드를 할 수 있도록 설계하였으며, 일반적인 물리엔진으로 처리하기에는 예외적인 부분이 많아서 느리기에 적합한 자료구조를 사용하여 메인 로직을 경량화 하였다. 많은 양의 서버/클라이언트 공통 데이터가 필요하여 공통 데이터를 서버/클라이언트에서 쉽게 접근할 수 있도록 코드 생성과 데이터 변환 및 검증을 하는 툴을 개발하여 사용하였으며, API문서를 document comment기반으로 생성해주는 툴을 개발하였다.
+\end{xkr}
 
 \section{
   \xen{Other personal projects}
   \xkr{기타 개인 프로젝트}
   \xjp{他のプロジェクト}
 }
+\subsection{i18next-korean-postposition-processor}
+\url{https://github.com/Perlmint/i18next-korean-postposition-processor}
+\begin{xkr}
+  다국어지원 중 자연스러운 한국어를 지원하기 위해서 필요한 조사를 자동으로 선택해주는 i18next 처리기. 가장 기본이 되는 한글 뿐만 아니라 다른 언어 및 기호에도 적용을 할 수 있도록 하기 위하여 모듈화를 하여 필요에 따른 기능 추가를 지원한다.
+\end{xkr}
+
+\subsection{ya-i18next-webpack-plugin}
+\url{https://github.com/Perlmint/ya-i18next-webpack-plugin}
+\begin{xkr}
+  기존의 i18next 웹팩 플러그인은 언어별로 js, html 결과물을 생성하나, 이 플러그인은 하나의 js, html을 생성하고 그 대신에 언어 파일을 따로 로드하여 사용할 수 있도록 지원한다. 또한, 코드에서 사용 되었으나 존재하지 않는 번역 키에 대해서 경고를 해주는 기능이 있으며, 소스맵을 사용하여 경고가 발생하는 원본 소스의 위치를 정확히 알려준다.
+\end{xkr}
+
 \subsection{Typedsequelize}
 \url{https://github.com/perlmint/typedsequelize}
 

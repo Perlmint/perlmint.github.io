@@ -1,0 +1,24 @@
+company: 사이냅소프트
+begin: 2012-08-01T00:00:00+09:00
+end: 2014-04-01T00:00:00+09:00
+projects:
+  -
+    name: HTML 변환기 2013
+    description: doc/x, ppt/x, xls/x, hwp등의 오피스 문서를 HTML로 변환해주는 프로그램
+    tech:
+      - C++
+      - CMake
+    works:
+      - i18n, l10n 지원 - 인코딩 문제 수정, GNU gettext와 비슷하지만 언어 리소스를 실행파일에 포함하는 시스템 구현.
+      - 스킨 기능 - HTML 변환 결과물에 스킨 템플릿을 적용
+      - 코드 리팩토링 - 코드 복잡도를 낮추기 위하여 오래된 레거시 코드를 리팩토링.
+      - CI 관리 - 다중 타겟 빌드 테스트, 유닛 테스트, 코드 품질 측정 재구축
+  -
+    name: 모바일 오피스 (네이버 모바일 오피스)
+    description: 오피스 문서 뷰어 및 편집기
+    tech:
+      - C++
+      - CMake
+      - protobuf
+    works:
+      - 문서 임포터를 개발함. doc, docx, ppt, hwp3 포맷에 대응하는 임포터 개발.

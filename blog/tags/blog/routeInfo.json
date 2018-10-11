@@ -1,1 +1,1 @@
-{"path":"blog/tags/blog","templateID":2,"sharedPropsHashes":{},"localProps":{"title":"tag - blog","posts":[{"id":"blog_with_react_static","title":"react-static으로 블로그 만들기","date":"2018-10-09T06:58:00.000Z","categories":["software"],"tags":["react-static","blog"],"body":""}]}}
+{"path":"blog/tags/blog","templateID":2,"sharedPropsHashes":{},"localProps":{"title":"tag - blog","posts":[{"id":"blog_with_react_static","title":"react-static으로 블로그 만들기","date":"2018-10-09T06:58:00.000Z","categories":["software"]}]}}

@@ -5,7 +5,7 @@ import markdown from 'markdown-it';
 import yaml from 'js-yaml';
 import { watch } from 'chokidar';
 import { reloadRoutes } from 'react-static/node';
-import { orderBy, escapeRegExp } from 'lodash';
+import { orderBy, escapeRegExp, omit } from 'lodash';
 import React from 'react';
 import ExtractCssChunks from 'extract-css-chunks-webpack-plugin';
 import { SheetsRegistry } from 'react-jss/lib/jss';
@@ -67,6 +67,10 @@ function loadData(root, filter, processor) {
   );
 }
 
+function pickPostSummary(posts) {
+  return posts.map(post => omit(post, ['tags', 'body']));
+}
+
 const data_root = path.join(__dirname, 'data');
 watch(data_root).on('all', () => reloadRoutes())
 
@@ -83,8 +87,11 @@ export default {
       post => post.date,
       'desc'
     );
+    const postsSummary = pickPostSummary(posts);
+
     const tags = {};
-    for (const post of posts) {
+    for (let idx = 0; idx < posts.length; idx++) {
+      const post = posts[idx];
       if (!post.tags) {
         continue;
       }
@@ -93,7 +100,7 @@ export default {
           tags[tag] = [];
         }
 
-        tags[tag].push(post);
+        tags[tag].push(postsSummary[idx]);
       }
     }
 
@@ -126,7 +133,7 @@ export default {
         component: 'src/containers/Posts',
         getData: () => ({
           title: 'all',
-          posts,
+          posts: postsSummary,
         }),
         children: [...posts.map(post => ({
           path: `/post/${post.id}`,

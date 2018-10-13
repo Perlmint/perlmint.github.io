@@ -11,6 +11,8 @@ import { reduce } from 'lodash';
 import { IPost } from '../types';
 import TagList from './TagList';
 
+import 'prismjs/themes/prism-solarizedlight.css';
+
 interface IProps {
   post: IPost;
 }

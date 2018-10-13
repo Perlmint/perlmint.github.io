@@ -14,13 +14,16 @@ import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@mate
 import 'ts-node/register';
 import theme from './src/theme';
 
+import markdownItPrism from '@iktakahiro/markdown-it-prismjs';
+
 const md = new markdown();
+md.use(markdownItPrism);
 
 // Paths Aliases defined through tsconfig.json
 const typescriptWebpackPaths = require('./webpack.config.js')
 
 /**
- * @param {string} filepath 
+ * @param {string} filepath
  */
 async function parsePost(filepath) {
   const basename = path.basename(filepath, ".md");
@@ -49,7 +52,7 @@ async function parsePost(filepath) {
 }
 
 /**
- * @param {string} root 
+ * @param {string} root
  * @param {function} filter
  * @param {function} processor
  */

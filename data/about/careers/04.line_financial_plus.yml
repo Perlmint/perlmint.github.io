@@ -1,2 +1,15 @@
 company: 라인파이낸셜플러스
 begin: 2018-09-03T00:00:00+09:00
+projects:
+  -
+    name: 알고리즘 트레이딩 시스템 개발
+    description: 실시간 알고리즘 트레이딩 전략 개발 및 UI, 통신 설계
+    tech:
+      - C++
+      - rust
+      - grpc
+      - Zero cost abstraction
+      - Template meta programming
+      - Compile time evaluation
+    works:
+      -

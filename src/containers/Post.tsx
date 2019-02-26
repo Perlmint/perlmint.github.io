@@ -2,7 +2,10 @@ import React from 'react';
 
 import { Head, Link, withRouteData } from 'react-static';
 
-import { Chip, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from '@material-ui/core';
+import {
+  Chip, createStyles, Divider, Grid, List, ListItem,
+  ListItemText, Paper, Typography, withStyles, WithStyles
+} from '@material-ui/core';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeftRounded';
 
 import convert from 'htmr';
@@ -17,7 +20,18 @@ interface IProps {
   post: IPost;
 }
 
-export default withRouteData(({ post }: IProps) => (
+const styles = createStyles({
+  'post': {
+    lineHeight: 1.5,
+  },
+  '@media (min-width: 1024px)': {
+    post: {
+      paddingLeft: '2em',
+    },
+  },
+});
+
+export default withStyles(styles)(withRouteData(({ post, classes }: IProps & WithStyles<typeof styles>) => (
   <Grid container justify='center' style={{ padding: '1em', paddingTop: 0 }}>
     <Grid item xs={12} lg={6}>
       <Paper style={{ padding: '2em', }}>
@@ -38,7 +52,7 @@ export default withRouteData(({ post }: IProps) => (
           </div>
         </div>
         <Divider />
-        <div style={{ paddingLeft: '2em', lineHeight: 1.5 }}>
+        <div className={classes.post}>
           {convert(post.body)}
         </div>
         <Divider />
@@ -62,4 +76,4 @@ export default withRouteData(({ post }: IProps) => (
       </Paper>
     </Grid>
   </Grid>
-));
+)));

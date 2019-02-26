@@ -80,6 +80,7 @@ watch(data_root).on('all', () => reloadRoutes())
 export default {
   entry: path.join(__dirname, 'src', 'index.tsx'),
   extractCssChunks: true,
+  siteRoot: 'https://www.perlmint.app',
   getSiteData: () => ({
     title: 'Perlmint',
   }),

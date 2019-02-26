@@ -9,7 +9,7 @@ import {
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeftRounded';
 
 import convert from 'htmr';
-import { reduce } from 'lodash';
+import { defaultTo, reduce } from 'lodash';
 
 import { IPost } from '../types';
 import TagList from './TagList';
@@ -37,7 +37,7 @@ export default withStyles(styles)(withRouteData(({ post, classes }: IProps & Wit
       <Paper style={{ padding: '2em', }}>
         <Head>
           <title>{post.title}</title>
-          <meta name='keywords' content={post.tags.join(',')} />
+          <meta name='keywords' content={defaultTo(post.tags, []).join(',')} />
           <meta name='twitter:card' content='summary' />
           <meta name='twitter:title' content={post.title} />
         </Head>

@@ -28,6 +28,7 @@
     "react-static": "^5.9.12"
   },
   "devDependencies": {
+    "@iktakahiro/markdown-it-prismjs": "^1.0.2",
     "@types/axios": "^0.14.0",
     "@types/chokidar": "^1.7.5",
     "@types/fs-extra": "^5.0.4",

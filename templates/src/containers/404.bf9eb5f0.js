@@ -1,2 +1,0 @@
-webpackJsonp([4],{188:function(e,t,n){"use strict";function u(){return a.default.createElement("div",null,a.default.createElement("h1",null,"404 - Oh no's! We couldn't find that page :("))}Object.defineProperty(t,"__esModule",{value:!0}),t.default=u;var l=n(1),a=function(e){return e&&e.__esModule?e:{default:e}}(l)}});
-//# sourceMappingURL=404.bf9eb5f0.js.map

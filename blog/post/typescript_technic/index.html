@@ -1,0 +1,1430 @@
+<!DOCTYPE html><html lang="en"><head><title data-react-helmet="true">Typescript의 타입 시스템을 활용하는 테크닉</title><meta data-react-helmet="true" name="keywords" content="typescript"/><meta data-react-helmet="true" name="twitter:card" content="summary"/><meta data-react-helmet="true" name="twitter:title" content="Typescript의 타입 시스템을 활용하는 테크닉"/><link rel="preload" as="script" href="https://www.perlmint.app/bootstrap.aefbadb1.js"/><link rel="preload" as="script" href="https://www.perlmint.app/templates/src/containers/Post.5a0bce5d.js"/><link rel="preload" as="script" href="https://www.perlmint.app/main.7e6329eb.js"/><link rel="preload" as="style" href="https://www.perlmint.app/main.6eddb0f43dcfad7695c1769c56ed562a.css"/><link rel="stylesheet" href="https://www.perlmint.app/main.6eddb0f43dcfad7695c1769c56ed562a.css"/><link rel="preload" as="style" href="https://www.perlmint.app/main.6eddb0f43dcfad7695c1769c56ed562a.css"/><link rel="stylesheet" href="https://www.perlmint.app/main.6eddb0f43dcfad7695c1769c56ed562a.css"/><link rel="preload" as="style" href="https://www.perlmint.app/src/containers/Post.e077ec7f4d96721ed2572ba17999438a.css"/><link rel="stylesheet" href="https://www.perlmint.app/src/containers/Post.e077ec7f4d96721ed2572ba17999438a.css"/><link rel="preload" as="style" href="https://www.perlmint.app/src/containers/Post.e077ec7f4d96721ed2572ba17999438a.css"/><link rel="stylesheet" href="https://www.perlmint.app/src/containers/Post.e077ec7f4d96721ed2572ba17999438a.css"/><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body><div id="root"><div data-reactroot=""><header class="jss14 jss20 jss5 jss9 jss12"><div class="jss41 jss44 jss42 jss4"><div class="jss45" style="flex:1"><div class="jss46"><div class="jss48 jss49" style="margin-bottom:0" role="tablist"><div class="jss46 jss47"><a class="jss66 jss54 jss56" tabindex="0" role="tab" aria-selected="false" href="https://www.perlmint.app/"><span class="jss62"><span class="jss63"><span class="jss64">Home</span></span></span><span class="jss69"></span></a><a class="jss66 jss54 jss56" tabindex="0" role="tab" aria-selected="false" href="https://www.perlmint.app/about"><span class="jss62"><span class="jss63"><span class="jss64">About</span></span></span><span class="jss69"></span></a><a class="jss66 jss54 jss56 jss59 active" aria-current="page" tabindex="0" role="tab" aria-selected="true" href="https://www.perlmint.app/blog"><span class="jss62"><span class="jss63"><span class="jss64">Posts</span></span></span><span class="jss76 jss78 jss53"></span><span class="jss69"></span></a></div></div></div></div></div></header><main class="jss1"><div class="jss80 jss97" style="padding:1em;padding-top:0"><div class="jss81 jss120 jss156"><div class="jss14 jss18 jss15" style="padding:2em"><div style="flex-direction:row;display:flex"><div><a class="active" aria-current="page" href="https://www.perlmint.app/blog"><svg class="jss177" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation" style="font-size:2em"><path d="M14.71 15.88L10.83 12l3.88-3.88c.39-.39.39-1.02 0-1.41a.9959.9959 0 0 0-1.41 0L8.71 11.3c-.39.39-.39 1.02 0 1.41l4.59 4.59c.39.39 1.02.39 1.41 0 .38-.39.39-1.03 0-1.42z"></path></svg></a></div><div><h1 class="jss186 jss191">Typescript의 타입 시스템을 활용하는 테크닉</h1><h3 class="jss186 jss193">2/25/2019, 6:58:00 AM</h3></div></div><hr class="jss212"/><div class="jss79"><p>이 글은 <a href="https://github.com/lacti/typescript-webworker-rpc">Typescript WebWorker RPC</a>에 기여를 하면서 사용한 테크닉을 정리하는 글이다.
+여기에 정리하는 내용과 예시는 기여한 내용과 관련된 내용만을 다룬다.</p>
+<h2>특정 타입만을 멤버로 가지는 타입 조건</h2>
+<p>특정 타입만을 멤버로 가지는 타입 조건 자체는 기본적이며 단순하다. 우선 다음과 같은 형태로 표현이 가능하다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">class</span> <span class="token class-name">RPC</span><span class="token operator">&lt;</span><span class="token constant">RPC</span> <span class="token keyword">extends</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">[</span>key<span class="token punctuation">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token builtin">Function</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token operator">&gt;</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+</code></pre>
+<p>하지만 위와 같은 타입을 사용하면 Type literal에는 문제가 없으나 interface를 사용할 수 없다는 문제가 있다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token comment">// correct!</span>
+<span class="token keyword">const</span> rpc_with_type_literal <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RPC</span><span class="token operator">&lt;</span><span class="token punctuation">{</span>
+    <span class="token function">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword">void</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">interface</span> <span class="token class-name">RPCDecl</span> <span class="token punctuation">{</span>
+    <span class="token function">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword">void</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// error!</span>
+<span class="token keyword">const</span> rpc_with_interface <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RPC</span><span class="token operator">&lt;</span>RPCDecl<span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>RPCDecl은 index operator에 동작을 안하니 쓸 수 없다는 에러가 발생하는데 이는 <code>[key: string]</code>이 가리키는 것이 RPCDecl의 키 보다 더 많기 때문이다.
+즉, 저 <code>key</code>가 가리키는 것을 제약을 걸어주면 되는데 정확히는 자기 자신이 가지고 있는 모든 키로 제약을 걸어주면 된다.
+<a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">Curiosly recurring template pattern</a> 처럼 자기 자신의 타입을 참조하는 방식으로 다음과 같은 코드를 작성할 수 있고 사용에 있어서 원치 않는 제약을 피할 수 있다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">type</span> RPCDeclaration<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token operator">&gt;</span> <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span><span class="token constant">K</span> <span class="token keyword">in</span> keyof <span class="token constant">RPC</span><span class="token punctuation">]</span><span class="token punctuation">:</span> AnyFunction <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">RPC</span><span class="token operator">&lt;</span>RPCDecl <span class="token keyword">extends</span> <span class="token class-name">RPCDeclaration</span><span class="token operator">&lt;</span>RPCDecl<span class="token operator">&gt;</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+</code></pre>
+<h2>타입 안전한 여러 인자가 사용 가능한 proxy method</h2>
+<p>3.0에서 추가된 <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#generic-rest-parameters">generic rest parameter</a>덕에 <code>bind</code>, <code>apply</code>와 같은 함수의 타입들에서도 타입 검사가 가능해졌다.
+그리고 <code>Parameter</code>, <code>ReturnType</code>과 같은 함수에 대한 상세한 타입 정보를 얻을 수 있는 기본 제공 타입이 여럿 추가 되었다.
+이를 사용하면 매우 간편하게 proxy method의 타입을 표현할 수 있다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">class</span> <span class="token class-name">RPC</span><span class="token operator">&lt;</span>RPCDecl<span class="token operator">&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">public</span> call<span class="token punctuation">:</span> <span class="token operator">&lt;</span><span class="token constant">M</span> <span class="token keyword">extends</span> <span class="token class-name">keyof</span> RPCDecl<span class="token operator">&gt;</span><span class="token punctuation">(</span>
+    method<span class="token punctuation">:</span> <span class="token constant">M</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>args<span class="token punctuation">:</span> Parameters<span class="token operator">&lt;</span>RPCDecl<span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span>
+  <span class="token punctuation">)</span> <span class="token operator">=&gt;</span> Promise<span class="token operator">&lt;</span>ReturnType<span class="token operator">&lt;</span>RPCDecl<span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>RPCDecl에서는 Promise가 아니었던 리턴타입을 Promise로 변환하고, method 이름을 인자로 받고, 원래 인자들을 rest parameter로 표현할 수 있다.</p>
+<h2>phantom type을 활용한 method에 제약 걸기</h2>
+<p>phantom type은 실제 데이터 표현으로는 의미가 없는 정보를 타입에 넣는 것으로, 타입 시스템이 의미적인 검증을 할 수 있도록 사용할 수 있다.
+typescript에서는 실제 표현하려는 타입에 <code>never</code> 타입인 멤버를 넣는 것으로 표현할 수 있으며, 캐스팅을 통해서 값이 해당 타입을 가지도록 한 후에 사용한다.</p>
+<p>여기서는 RPC의 정의에 post 프로시저와 call 프로시저를 phantom type을 통해서 구분하도록 하고, 각각의 프로시저에 대한 method인 <code>RPC.post</code>, <code>RPC.call</code> 중 매칭되는 것만을 호출할 수 있도록 제한하는데 사용했다.</p>
+<p>RPC 정의 타입은 타입 검사에서만 사용되고 실제로 구현을 하는 타입이 아닌만큼 phantom type을 조금 색다르게 사용 해 보았다.
+대부분의 경우 추가적인 태그가 달리기를 원하는 타입 자체를 phantom type으로 표현을 하겠으나, post 프로시저에 대응되는 interface method선언에서 리턴타입을 phantom type으로 대체를 하는 방법을 사용했다. 우선 post 프로시저는 리턴타입이 있으면 안된다는 제약조건이 있으며, 해당 타입을 직접 써야하는 곳이 없기 때문에 원하는 대로 대체해서 쓰기에 불편한 점이 없었다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">interface</span> <span class="token class-name">PostReturn</span> <span class="token punctuation">{</span>
+  __post__<span class="token punctuation">:</span> never<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">interface</span> <span class="token class-name">RPCDecl</span> <span class="token punctuation">{</span>
+    <span class="token function">someCallProcedure</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword">void</span><span class="token punctuation">;</span>
+    <span class="token function">somePostProcedure</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> PostReturn<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>위와 같이 리턴타입을 <code>PostReturn</code>으로 선언하는 것만으로 해당 프로시저가 post임을 표현할 수 있다.</p>
+<p>이제 저 정보를 사용해서 <code>RPC.post</code>, <code>RPC.call</code>에 사용할 수 있는 프로시저 종류에 제약을 걸어보자.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">type</span> PostMethodCondition<span class="token operator">&lt;</span><span class="token constant">FN</span> <span class="token keyword">extends</span> <span class="token class-name">Function</span><span class="token punctuation">,</span> <span class="token constant">T</span><span class="token punctuation">,</span> <span class="token constant">F</span><span class="token operator">&gt;</span> <span class="token operator">=</span> ReturnType<span class="token operator">&lt;</span><span class="token constant">FN</span><span class="token operator">&gt;</span> <span class="token keyword">extends</span> <span class="token class-name">PostReturn</span> <span class="token operator">?</span> <span class="token constant">T</span> <span class="token punctuation">:</span> <span class="token constant">F</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> CallMethodNames<span class="token operator">&lt;</span>
+  <span class="token constant">T</span> <span class="token keyword">extends</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span><span class="token constant">K</span><span class="token punctuation">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token builtin">Function</span> <span class="token punctuation">}</span>
+  <span class="token operator">&gt;</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">[</span><span class="token constant">K</span> <span class="token keyword">in</span> keyof <span class="token constant">T</span><span class="token punctuation">]</span><span class="token punctuation">:</span> PostMethodCondition<span class="token operator">&lt;</span><span class="token constant">T</span><span class="token punctuation">[</span><span class="token constant">K</span><span class="token punctuation">]</span><span class="token punctuation">,</span> never<span class="token punctuation">,</span> <span class="token constant">K</span><span class="token operator">&gt;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">[</span>keyof <span class="token constant">T</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> PostMethodNames<span class="token operator">&lt;</span><span class="token constant">T</span> <span class="token keyword">extends</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span><span class="token constant">K</span><span class="token punctuation">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token builtin">Function</span> <span class="token punctuation">}</span><span class="token operator">&gt;</span> <span class="token operator">=</span> Exclude<span class="token operator">&lt;</span>keyof <span class="token constant">T</span><span class="token punctuation">,</span> CallMethodNames<span class="token operator">&lt;</span><span class="token constant">T</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">;</span>
+</code></pre>
+<p>우선 RPCDecl의 키 메소드 이름 중에서 <code>ReturnType</code>이 <code>PostReturn</code>인 것만을 골라내는 것으로 call 프로시저와 post 프로시저의 이름 타입을 추출할 수 있다.
+타입을 필터링하는 <code>PostMethodCondition</code>은 2.8에서 추가된 <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#conditional-types">Conditional Type</a>을 사용해서 표현할 수 있다.</p>
+<p>각각의 method에 다음과 같이 기준이 되는 값의 제약인 키를 기존의 <code>keyof RPCDecl</code> 대신에 더 좁은 범위의 타입으로 변경하는 것으로 <code>method</code> 값에 따라서 해당 method를 호출하려고 할 때 타입 검사를 할 수 있다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">class</span> <span class="token class-name">RPC</span><span class="token operator">&lt;</span>RPCDecl<span class="token operator">&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> post<span class="token punctuation">:</span> <span class="token operator">&lt;</span><span class="token constant">M</span> <span class="token keyword">extends</span> <span class="token class-name">PostMethodNames</span><span class="token operator">&lt;</span>RPCDecl<span class="token operator">&gt;&gt;</span><span class="token punctuation">(</span>
+        method<span class="token punctuation">:</span> <span class="token constant">M</span><span class="token punctuation">,</span>
+        <span class="token operator">...</span>args<span class="token punctuation">:</span> Parameters<span class="token operator">&lt;</span>RPCDecl<span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span>
+    <span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token keyword">void</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> call<span class="token punctuation">:</span> <span class="token operator">&lt;</span><span class="token constant">M</span> <span class="token keyword">extends</span> <span class="token class-name">CallMethodNames</span><span class="token operator">&lt;</span>RPCDecl<span class="token operator">&gt;&gt;</span><span class="token punctuation">(</span>
+        method<span class="token punctuation">:</span> <span class="token constant">M</span><span class="token punctuation">,</span>
+        <span class="token operator">...</span>args<span class="token punctuation">:</span> Parameters<span class="token operator">&lt;</span>RPCDecl<span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span>
+    <span class="token punctuation">)</span> <span class="token operator">=&gt;</span> Promise<span class="token operator">&lt;</span>ReturnType<span class="token operator">&lt;</span>RPCDecl<span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h2>Conditional type으로 표현한 함수에서 조건에 따른 optional인자 받기</h2>
+<p>conditional type으로 함수의 인자를 optional로 하고 싶더라도 인자가 optional로 지정되어있지 않으면 호출 할 때 꼭 값을 명시해줘야 한다. 심지어 undefined여도 말이다. never인 경우에는 넣을 평범한 방법이 없으니 타입 오류 없이 호출이 불가능해져버린다. 그렇다고 인자를 optional로 지정하면 optional이 아닌 경우에도 optional일 수 밖에 없는 문제가 있다.</p>
+<p>즉, overload로 함수를 표현해줘서 optional인 경우는 optional로 표현을 해줄 수 밖에 없다.</p>
+<p>현재 arrow function에 대해서는 overload를 지원하지 않는 것 같으므로 별도의 interface로 overload 타입을 선언하고 arrow function을 대입하는 방법으로 해결을 했다.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">type</span> RPCHandlerRType<span class="token operator">&lt;</span><span class="token constant">F</span> <span class="token keyword">extends</span> <span class="token class-name">AnyFunction</span><span class="token operator">&gt;</span> <span class="token operator">=</span> ReturnType<span class="token operator">&lt;</span><span class="token constant">F</span><span class="token operator">&gt;</span> <span class="token keyword">extends</span> <span class="token class-name">void</span> <span class="token operator">?</span> <span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">|</span> <span class="token punctuation">{</span> result<span class="token operator">?</span><span class="token punctuation">:</span> never<span class="token punctuation">,</span> transfer<span class="token punctuation">:</span> Transferable<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">:</span> <span class="token punctuation">{</span>
+  result<span class="token punctuation">:</span> ReturnType<span class="token operator">&lt;</span><span class="token constant">F</span><span class="token operator">&gt;</span><span class="token punctuation">;</span>
+  transfer<span class="token operator">?</span><span class="token punctuation">:</span> Transferable<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">type</span> RPCHandler<span class="token operator">&lt;</span><span class="token constant">F</span> <span class="token keyword">extends</span> <span class="token class-name">AnyFunction</span><span class="token operator">&gt;</span> <span class="token operator">=</span> <span class="token punctuation">(</span>
+  <span class="token operator">...</span>args<span class="token punctuation">:</span> Parameters<span class="token operator">&lt;</span><span class="token constant">F</span><span class="token operator">&gt;</span>
+<span class="token punctuation">)</span> <span class="token operator">=&gt;</span> PromiseOrValue<span class="token operator">&lt;</span>PostMethodCondition<span class="token operator">&lt;</span><span class="token constant">F</span><span class="token punctuation">,</span> <span class="token keyword">void</span><span class="token punctuation">,</span> RPCHandlerRType<span class="token operator">&lt;</span><span class="token constant">F</span><span class="token operator">&gt;&gt;&gt;</span><span class="token punctuation">;</span>
+<span class="token keyword">interface</span> <span class="token class-name">PostRPCHandlerOptions</span> <span class="token punctuation">{</span>
+  noReturn<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">type</span> CallRPCHandlerOptions <span class="token operator">=</span> never<span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> RPCHandlerOptions<span class="token operator">&lt;</span><span class="token constant">F</span> <span class="token keyword">extends</span> <span class="token class-name">AnyFunction</span><span class="token operator">&gt;</span> <span class="token operator">=</span> PostMethodCondition<span class="token operator">&lt;</span><span class="token constant">F</span><span class="token punctuation">,</span> PostRPCHandlerOptions<span class="token punctuation">,</span> CallRPCHandlerOptions<span class="token operator">&gt;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">interface</span> <span class="token class-name">RPCServerOnMethod</span><span class="token operator">&lt;</span><span class="token constant">RPC</span> <span class="token keyword">extends</span> <span class="token class-name">RPCDeclaration</span><span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token operator">&gt;&gt;</span> <span class="token punctuation">{</span>
+  <span class="token operator">&lt;</span><span class="token constant">M</span> <span class="token keyword">extends</span> <span class="token class-name">CallMethodNames</span><span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">(</span>
+    method<span class="token punctuation">:</span> <span class="token constant">M</span><span class="token punctuation">,</span>
+    handler<span class="token punctuation">:</span> RPCHandler<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span><span class="token punctuation">,</span>
+    options<span class="token operator">?</span><span class="token punctuation">:</span> RPCHandlerOptions<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span><span class="token punctuation">,</span>
+  <span class="token punctuation">)</span><span class="token punctuation">:</span> RPCServer<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token operator">&gt;</span><span class="token punctuation">,</span>
+  <span class="token operator">&lt;</span><span class="token constant">M</span> <span class="token keyword">extends</span> <span class="token class-name">PostMethodNames</span><span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">(</span>
+    method<span class="token punctuation">:</span> <span class="token constant">M</span><span class="token punctuation">,</span>
+    handler<span class="token punctuation">:</span> RPCHandler<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span><span class="token punctuation">,</span>
+    options<span class="token punctuation">:</span> RPCHandlerOptions<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token punctuation">[</span><span class="token constant">M</span><span class="token punctuation">]</span><span class="token operator">&gt;</span><span class="token punctuation">,</span>
+  <span class="token punctuation">)</span><span class="token punctuation">:</span> RPCServer<span class="token operator">&lt;</span><span class="token constant">RPC</span><span class="token operator">&gt;</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>앞서 phantom type과 mapped type을 사용하여 여러 메소드에 각각 타입 조건을 건 것을 이번에는 overload 타입을 표현하는데 사용했다.</p></div><hr class="jss212"/><ul class="jss216 jss217"><li class="jss220 jss223 jss227"><div class="jss231"><h3 class="jss186 jss193">Categories</h3><p class="jss186 jss195 jss210 jss235"><span role="button" class="jss237 jss246" tabindex="-1"><span class="jss256">software</span></span> </p></div></li><li class="jss220 jss223 jss227"><div class="jss231"><h3 class="jss186 jss193">Tags</h3><p class="jss186 jss195 jss210 jss235"><a href="https://www.perlmint.app/blog/tags/typescript"><span role="button" class="jss237 jss246" tabindex="-1"><span class="jss256">typescript</span></span></a> </p></div></li></ul></div></div></div></main></div></div><style id="jss-server-side">.jss14 {
+  background-color: #fff;
+}
+.jss15 {
+  border-radius: 4px;
+}
+.jss16 {
+  box-shadow: none;
+}
+.jss17 {
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),0px 1px 1px 0px rgba(0, 0, 0, 0.14),0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+.jss18 {
+  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2),0px 2px 2px 0px rgba(0, 0, 0, 0.14),0px 3px 1px -2px rgba(0, 0, 0, 0.12);
+}
+.jss19 {
+  box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.2),0px 3px 4px 0px rgba(0, 0, 0, 0.14),0px 3px 3px -2px rgba(0, 0, 0, 0.12);
+}
+.jss20 {
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),0px 4px 5px 0px rgba(0, 0, 0, 0.14),0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+.jss21 {
+  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),0px 5px 8px 0px rgba(0, 0, 0, 0.14),0px 1px 14px 0px rgba(0, 0, 0, 0.12);
+}
+.jss22 {
+  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),0px 6px 10px 0px rgba(0, 0, 0, 0.14),0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+}
+.jss23 {
+  box-shadow: 0px 4px 5px -2px rgba(0, 0, 0, 0.2),0px 7px 10px 1px rgba(0, 0, 0, 0.14),0px 2px 16px 1px rgba(0, 0, 0, 0.12);
+}
+.jss24 {
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),0px 8px 10px 1px rgba(0, 0, 0, 0.14),0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+.jss25 {
+  box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.2),0px 9px 12px 1px rgba(0, 0, 0, 0.14),0px 3px 16px 2px rgba(0, 0, 0, 0.12);
+}
+.jss26 {
+  box-shadow: 0px 6px 6px -3px rgba(0, 0, 0, 0.2),0px 10px 14px 1px rgba(0, 0, 0, 0.14),0px 4px 18px 3px rgba(0, 0, 0, 0.12);
+}
+.jss27 {
+  box-shadow: 0px 6px 7px -4px rgba(0, 0, 0, 0.2),0px 11px 15px 1px rgba(0, 0, 0, 0.14),0px 4px 20px 3px rgba(0, 0, 0, 0.12);
+}
+.jss28 {
+  box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.2),0px 12px 17px 2px rgba(0, 0, 0, 0.14),0px 5px 22px 4px rgba(0, 0, 0, 0.12);
+}
+.jss29 {
+  box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.2),0px 13px 19px 2px rgba(0, 0, 0, 0.14),0px 5px 24px 4px rgba(0, 0, 0, 0.12);
+}
+.jss30 {
+  box-shadow: 0px 7px 9px -4px rgba(0, 0, 0, 0.2),0px 14px 21px 2px rgba(0, 0, 0, 0.14),0px 5px 26px 4px rgba(0, 0, 0, 0.12);
+}
+.jss31 {
+  box-shadow: 0px 8px 9px -5px rgba(0, 0, 0, 0.2),0px 15px 22px 2px rgba(0, 0, 0, 0.14),0px 6px 28px 5px rgba(0, 0, 0, 0.12);
+}
+.jss32 {
+  box-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.2),0px 16px 24px 2px rgba(0, 0, 0, 0.14),0px 6px 30px 5px rgba(0, 0, 0, 0.12);
+}
+.jss33 {
+  box-shadow: 0px 8px 11px -5px rgba(0, 0, 0, 0.2),0px 17px 26px 2px rgba(0, 0, 0, 0.14),0px 6px 32px 5px rgba(0, 0, 0, 0.12);
+}
+.jss34 {
+  box-shadow: 0px 9px 11px -5px rgba(0, 0, 0, 0.2),0px 18px 28px 2px rgba(0, 0, 0, 0.14),0px 7px 34px 6px rgba(0, 0, 0, 0.12);
+}
+.jss35 {
+  box-shadow: 0px 9px 12px -6px rgba(0, 0, 0, 0.2),0px 19px 29px 2px rgba(0, 0, 0, 0.14),0px 7px 36px 6px rgba(0, 0, 0, 0.12);
+}
+.jss36 {
+  box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.2),0px 20px 31px 3px rgba(0, 0, 0, 0.14),0px 8px 38px 7px rgba(0, 0, 0, 0.12);
+}
+.jss37 {
+  box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.2),0px 21px 33px 3px rgba(0, 0, 0, 0.14),0px 8px 40px 7px rgba(0, 0, 0, 0.12);
+}
+.jss38 {
+  box-shadow: 0px 10px 14px -6px rgba(0, 0, 0, 0.2),0px 22px 35px 3px rgba(0, 0, 0, 0.14),0px 8px 42px 7px rgba(0, 0, 0, 0.12);
+}
+.jss39 {
+  box-shadow: 0px 11px 14px -7px rgba(0, 0, 0, 0.2),0px 23px 36px 3px rgba(0, 0, 0, 0.14),0px 9px 44px 8px rgba(0, 0, 0, 0.12);
+}
+.jss40 {
+  box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2),0px 24px 38px 3px rgba(0, 0, 0, 0.14),0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+}
+.jss5 {
+  width: 100%;
+  display: flex;
+  z-index: 1100;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+.jss6 {
+  top: 0;
+  left: auto;
+  right: 0;
+  position: fixed;
+}
+.jss7 {
+  top: 0;
+  left: auto;
+  right: 0;
+  position: absolute;
+}
+.jss8 {
+  top: 0;
+  left: auto;
+  right: 0;
+  position: sticky;
+}
+.jss9 {
+  position: static;
+}
+.jss10 {
+  position: relative;
+}
+.jss11 {
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #f5f5f5;
+}
+.jss12 {
+  color: #fff;
+  background-color: #3f51b5;
+}
+.jss13 {
+  color: #fff;
+  background-color: #f50057;
+}
+.jss69 {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  position: absolute;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.jss70 {
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
+  opacity: 0;
+  position: absolute;
+}
+.jss71 {
+  opacity: 0.3;
+  transform: scale(1);
+  animation: mui-ripple-enter 550ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.jss72 {
+  animation-duration: 200ms;
+}
+.jss73 {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  display: block;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+.jss74 {
+  opacity: 0;
+  animation: mui-ripple-exit 550ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.jss75 {
+  top: 0;
+  left: 0;
+  position: absolute;
+  animation: mui-ripple-pulsate 2500ms cubic-bezier(0.4, 0, 0.2, 1) 200ms infinite;
+}
+@keyframes mui-ripple-enter {
+  0% {
+    opacity: 0.1;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+@keyframes mui-ripple-exit {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes mui-ripple-pulsate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.jss66 {
+  color: inherit;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  outline: none;
+  padding: 0;
+  position: relative;
+  align-items: center;
+  user-select: none;
+  border-radius: 0;
+  vertical-align: middle;
+  justify-content: center;
+  -moz-appearance: none;
+  text-decoration: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.jss66::-moz-focus-inner {
+  border-style: none;
+}
+.jss66.jss67 {
+  cursor: default;
+  pointer-events: none;
+}
+.jss186 {
+  margin: 0;
+  display: block;
+}
+.jss187 {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 7rem;
+  font-weight: 300;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.14286em;
+  margin-left: -.04em;
+  letter-spacing: -.04em;
+}
+.jss188 {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 3.5rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.30357em;
+  margin-left: -.02em;
+  letter-spacing: -.02em;
+}
+.jss189 {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 2.8125rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.13333em;
+  margin-left: -.02em;
+}
+.jss190 {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 2.125rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.20588em;
+}
+.jss191 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.35417em;
+}
+.jss192 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1.3125rem;
+  font-weight: 500;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.16667em;
+}
+.jss193 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.5em;
+}
+.jss194 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.71429em;
+}
+.jss195 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.46429em;
+}
+.jss196 {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 0.75rem;
+  font-weight: 400;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  line-height: 1.375em;
+}
+.jss197 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  text-transform: uppercase;
+}
+.jss198 {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  overflow: hidden;
+}
+.jss199 {
+  text-align: left;
+}
+.jss200 {
+  text-align: center;
+}
+.jss201 {
+  text-align: right;
+}
+.jss202 {
+  text-align: justify;
+}
+.jss203 {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.jss204 {
+  margin-bottom: 0.35em;
+}
+.jss205 {
+  margin-bottom: 16px;
+}
+.jss206 {
+  color: inherit;
+}
+.jss207 {
+  color: #3f51b5;
+}
+.jss208 {
+  color: #f50057;
+}
+.jss209 {
+  color: rgba(0, 0, 0, 0.87);
+}
+.jss210 {
+  color: rgba(0, 0, 0, 0.54);
+}
+.jss211 {
+  color: #f44336;
+}
+.jss177 {
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  font-size: 24px;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  user-select: none;
+  flex-shrink: 0;
+}
+.jss178 {
+  color: #3f51b5;
+}
+.jss179 {
+  color: #f50057;
+}
+.jss180 {
+  color: rgba(0, 0, 0, 0.54);
+}
+.jss181 {
+  color: #f44336;
+}
+.jss182 {
+  color: rgba(0, 0, 0, 0.26);
+}
+.jss183 {
+  font-size: inherit;
+}
+.jss184 {
+  font-size: 20px;
+}
+.jss185 {
+  font-size: 36px;
+}
+.jss237 {
+  color: rgba(0, 0, 0, 0.87);
+  height: 32px;
+  cursor: default;
+  border: none;
+  display: inline-flex;
+  outline: none;
+  padding: 0;
+  font-size: 0.8125rem;
+  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 16px;
+  vertical-align: middle;
+  justify-content: center;
+  text-decoration: none;
+  background-color: #e0e0e0;
+}
+.jss238 {
+  color: #fff;
+  background-color: #3f51b5;
+}
+.jss239 {
+  color: #fff;
+  background-color: #f50057;
+}
+.jss240 {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.jss240:hover, .jss240:focus {
+  background-color: rgb(206, 206, 206);
+}
+.jss240:active {
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),0px 1px 1px 0px rgba(0, 0, 0, 0.14),0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+  background-color: rgb(197, 197, 197);
+}
+.jss241:hover, .jss241:focus {
+  background-color: rgb(78, 94, 186);
+}
+.jss241:active {
+  background-color: rgb(86, 101, 189);
+}
+.jss242:hover, .jss242:focus {
+  background-color: rgb(245, 20, 100);
+}
+.jss242:active {
+  background-color: rgb(246, 30, 107);
+}
+.jss243:focus {
+  background-color: rgb(206, 206, 206);
+}
+.jss244:focus {
+  background-color: rgb(101, 115, 195);
+}
+.jss245:focus {
+  background-color: rgb(247, 51, 120);
+}
+.jss246 {
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  background-color: transparent;
+}
+.jss240.jss246:hover, .jss240.jss246:focus, .jss243.jss246:focus {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.jss247 {
+  color: #3f51b5;
+  border: 1px solid #3f51b5;
+}
+.jss240.jss247:hover, .jss240.jss247:focus, .jss243.jss247:focus {
+  background-color: rgba(63, 81, 181, 0.08);
+}
+.jss248 {
+  color: #f50057;
+  border: 1px solid #f50057;
+}
+.jss240.jss248:hover, .jss240.jss248:focus, .jss243.jss248:focus {
+  background-color: rgba(245, 0, 87, 0.08);
+}
+.jss249 {
+  width: 32px;
+  color: #616161;
+  height: 32px;
+  font-size: 1rem;
+  margin-right: -4px;
+}
+.jss250 {
+  color: #fff;
+  background-color: #303f9f;
+}
+.jss251 {
+  color: #fff;
+  background-color: #c51162;
+}
+.jss252 {
+  width: 19px;
+  height: 19px;
+}
+.jss253 {
+  color: #616161;
+  margin-left: 4px;
+  margin-right: -8px;
+}
+.jss254 {
+  color: inherit;
+}
+.jss255 {
+  color: inherit;
+}
+.jss256 {
+  cursor: inherit;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  white-space: nowrap;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.jss257 {
+  color: rgba(0, 0, 0, 0.26);
+  cursor: pointer;
+  height: auto;
+  margin: 0 4px 0 -8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.jss257:hover {
+  color: rgba(0, 0, 0, 0.4);
+}
+.jss258 {
+  color: rgba(255, 255, 255, 0.7);
+}
+.jss258:hover, .jss258:active {
+  color: #fff;
+}
+.jss259 {
+  color: rgba(255, 255, 255, 0.7);
+}
+.jss259:hover, .jss259:active {
+  color: #fff;
+}
+.jss260 {
+  color: rgba(63, 81, 181, 0.7);
+}
+.jss260:hover, .jss260:active {
+  color: #3f51b5;
+}
+.jss261 {
+  color: rgba(245, 0, 87, 0.7);
+}
+.jss261:hover, .jss261:active {
+  color: #f50057;
+}
+html {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+body {
+  margin: 0;
+  background-color: #fafafa;
+}
+@media print {
+  body {
+    background-color: #fff;
+  }
+}
+.jss212 {
+  height: 1px;
+  margin: 0;
+  border: none;
+  flex-shrink: 0;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.jss213 {
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+}
+.jss214 {
+  margin-left: 72px;
+}
+.jss215 {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.jss80 {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+.jss81 {
+  margin: 0;
+  box-sizing: border-box;
+}
+.jss82 {
+  min-width: 0;
+}
+.jss83 {
+  flex-direction: column;
+}
+.jss84 {
+  flex-direction: column-reverse;
+}
+.jss85 {
+  flex-direction: row-reverse;
+}
+.jss86 {
+  flex-wrap: nowrap;
+}
+.jss87 {
+  flex-wrap: wrap-reverse;
+}
+.jss88 {
+  align-items: center;
+}
+.jss89 {
+  align-items: flex-start;
+}
+.jss90 {
+  align-items: flex-end;
+}
+.jss91 {
+  align-items: baseline;
+}
+.jss92 {
+  align-content: center;
+}
+.jss93 {
+  align-content: flex-start;
+}
+.jss94 {
+  align-content: flex-end;
+}
+.jss95 {
+  align-content: space-between;
+}
+.jss96 {
+  align-content: space-around;
+}
+.jss97 {
+  justify-content: center;
+}
+.jss98 {
+  justify-content: flex-end;
+}
+.jss99 {
+  justify-content: space-between;
+}
+.jss100 {
+  justify-content: space-around;
+}
+.jss101 {
+  justify-content: space-evenly;
+}
+.jss102 {
+  width: calc(100% + 8px);
+  margin: -4px;
+}
+.jss102 &gt; .jss81 {
+  padding: 4px;
+}
+.jss103 {
+  width: calc(100% + 16px);
+  margin: -8px;
+}
+.jss103 &gt; .jss81 {
+  padding: 8px;
+}
+.jss104 {
+  width: calc(100% + 24px);
+  margin: -12px;
+}
+.jss104 &gt; .jss81 {
+  padding: 12px;
+}
+.jss105 {
+  width: calc(100% + 32px);
+  margin: -16px;
+}
+.jss105 &gt; .jss81 {
+  padding: 16px;
+}
+.jss106 {
+  width: calc(100% + 40px);
+  margin: -20px;
+}
+.jss106 &gt; .jss81 {
+  padding: 20px;
+}
+.jss107 {
+  flex-grow: 0;
+  max-width: none;
+  flex-basis: auto;
+}
+.jss108 {
+  flex-grow: 1;
+  max-width: 100%;
+  flex-basis: 0;
+}
+.jss109 {
+  flex-grow: 0;
+  max-width: 8.333333%;
+  flex-basis: 8.333333%;
+}
+.jss110 {
+  flex-grow: 0;
+  max-width: 16.666667%;
+  flex-basis: 16.666667%;
+}
+.jss111 {
+  flex-grow: 0;
+  max-width: 25%;
+  flex-basis: 25%;
+}
+.jss112 {
+  flex-grow: 0;
+  max-width: 33.333333%;
+  flex-basis: 33.333333%;
+}
+.jss113 {
+  flex-grow: 0;
+  max-width: 41.666667%;
+  flex-basis: 41.666667%;
+}
+.jss114 {
+  flex-grow: 0;
+  max-width: 50%;
+  flex-basis: 50%;
+}
+.jss115 {
+  flex-grow: 0;
+  max-width: 58.333333%;
+  flex-basis: 58.333333%;
+}
+.jss116 {
+  flex-grow: 0;
+  max-width: 66.666667%;
+  flex-basis: 66.666667%;
+}
+.jss117 {
+  flex-grow: 0;
+  max-width: 75%;
+  flex-basis: 75%;
+}
+.jss118 {
+  flex-grow: 0;
+  max-width: 83.333333%;
+  flex-basis: 83.333333%;
+}
+.jss119 {
+  flex-grow: 0;
+  max-width: 91.666667%;
+  flex-basis: 91.666667%;
+}
+.jss120 {
+  flex-grow: 0;
+  max-width: 100%;
+  flex-basis: 100%;
+}
+@media (min-width:600px) {
+  .jss121 {
+    flex-grow: 0;
+    max-width: none;
+    flex-basis: auto;
+  }
+  .jss122 {
+    flex-grow: 1;
+    max-width: 100%;
+    flex-basis: 0;
+  }
+  .jss123 {
+    flex-grow: 0;
+    max-width: 8.333333%;
+    flex-basis: 8.333333%;
+  }
+  .jss124 {
+    flex-grow: 0;
+    max-width: 16.666667%;
+    flex-basis: 16.666667%;
+  }
+  .jss125 {
+    flex-grow: 0;
+    max-width: 25%;
+    flex-basis: 25%;
+  }
+  .jss126 {
+    flex-grow: 0;
+    max-width: 33.333333%;
+    flex-basis: 33.333333%;
+  }
+  .jss127 {
+    flex-grow: 0;
+    max-width: 41.666667%;
+    flex-basis: 41.666667%;
+  }
+  .jss128 {
+    flex-grow: 0;
+    max-width: 50%;
+    flex-basis: 50%;
+  }
+  .jss129 {
+    flex-grow: 0;
+    max-width: 58.333333%;
+    flex-basis: 58.333333%;
+  }
+  .jss130 {
+    flex-grow: 0;
+    max-width: 66.666667%;
+    flex-basis: 66.666667%;
+  }
+  .jss131 {
+    flex-grow: 0;
+    max-width: 75%;
+    flex-basis: 75%;
+  }
+  .jss132 {
+    flex-grow: 0;
+    max-width: 83.333333%;
+    flex-basis: 83.333333%;
+  }
+  .jss133 {
+    flex-grow: 0;
+    max-width: 91.666667%;
+    flex-basis: 91.666667%;
+  }
+  .jss134 {
+    flex-grow: 0;
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+}
+@media (min-width:960px) {
+  .jss135 {
+    flex-grow: 0;
+    max-width: none;
+    flex-basis: auto;
+  }
+  .jss136 {
+    flex-grow: 1;
+    max-width: 100%;
+    flex-basis: 0;
+  }
+  .jss137 {
+    flex-grow: 0;
+    max-width: 8.333333%;
+    flex-basis: 8.333333%;
+  }
+  .jss138 {
+    flex-grow: 0;
+    max-width: 16.666667%;
+    flex-basis: 16.666667%;
+  }
+  .jss139 {
+    flex-grow: 0;
+    max-width: 25%;
+    flex-basis: 25%;
+  }
+  .jss140 {
+    flex-grow: 0;
+    max-width: 33.333333%;
+    flex-basis: 33.333333%;
+  }
+  .jss141 {
+    flex-grow: 0;
+    max-width: 41.666667%;
+    flex-basis: 41.666667%;
+  }
+  .jss142 {
+    flex-grow: 0;
+    max-width: 50%;
+    flex-basis: 50%;
+  }
+  .jss143 {
+    flex-grow: 0;
+    max-width: 58.333333%;
+    flex-basis: 58.333333%;
+  }
+  .jss144 {
+    flex-grow: 0;
+    max-width: 66.666667%;
+    flex-basis: 66.666667%;
+  }
+  .jss145 {
+    flex-grow: 0;
+    max-width: 75%;
+    flex-basis: 75%;
+  }
+  .jss146 {
+    flex-grow: 0;
+    max-width: 83.333333%;
+    flex-basis: 83.333333%;
+  }
+  .jss147 {
+    flex-grow: 0;
+    max-width: 91.666667%;
+    flex-basis: 91.666667%;
+  }
+  .jss148 {
+    flex-grow: 0;
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+}
+@media (min-width:1280px) {
+  .jss149 {
+    flex-grow: 0;
+    max-width: none;
+    flex-basis: auto;
+  }
+  .jss150 {
+    flex-grow: 1;
+    max-width: 100%;
+    flex-basis: 0;
+  }
+  .jss151 {
+    flex-grow: 0;
+    max-width: 8.333333%;
+    flex-basis: 8.333333%;
+  }
+  .jss152 {
+    flex-grow: 0;
+    max-width: 16.666667%;
+    flex-basis: 16.666667%;
+  }
+  .jss153 {
+    flex-grow: 0;
+    max-width: 25%;
+    flex-basis: 25%;
+  }
+  .jss154 {
+    flex-grow: 0;
+    max-width: 33.333333%;
+    flex-basis: 33.333333%;
+  }
+  .jss155 {
+    flex-grow: 0;
+    max-width: 41.666667%;
+    flex-basis: 41.666667%;
+  }
+  .jss156 {
+    flex-grow: 0;
+    max-width: 50%;
+    flex-basis: 50%;
+  }
+  .jss157 {
+    flex-grow: 0;
+    max-width: 58.333333%;
+    flex-basis: 58.333333%;
+  }
+  .jss158 {
+    flex-grow: 0;
+    max-width: 66.666667%;
+    flex-basis: 66.666667%;
+  }
+  .jss159 {
+    flex-grow: 0;
+    max-width: 75%;
+    flex-basis: 75%;
+  }
+  .jss160 {
+    flex-grow: 0;
+    max-width: 83.333333%;
+    flex-basis: 83.333333%;
+  }
+  .jss161 {
+    flex-grow: 0;
+    max-width: 91.666667%;
+    flex-basis: 91.666667%;
+  }
+  .jss162 {
+    flex-grow: 0;
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+}
+@media (min-width:1920px) {
+  .jss163 {
+    flex-grow: 0;
+    max-width: none;
+    flex-basis: auto;
+  }
+  .jss164 {
+    flex-grow: 1;
+    max-width: 100%;
+    flex-basis: 0;
+  }
+  .jss165 {
+    flex-grow: 0;
+    max-width: 8.333333%;
+    flex-basis: 8.333333%;
+  }
+  .jss166 {
+    flex-grow: 0;
+    max-width: 16.666667%;
+    flex-basis: 16.666667%;
+  }
+  .jss167 {
+    flex-grow: 0;
+    max-width: 25%;
+    flex-basis: 25%;
+  }
+  .jss168 {
+    flex-grow: 0;
+    max-width: 33.333333%;
+    flex-basis: 33.333333%;
+  }
+  .jss169 {
+    flex-grow: 0;
+    max-width: 41.666667%;
+    flex-basis: 41.666667%;
+  }
+  .jss170 {
+    flex-grow: 0;
+    max-width: 50%;
+    flex-basis: 50%;
+  }
+  .jss171 {
+    flex-grow: 0;
+    max-width: 58.333333%;
+    flex-basis: 58.333333%;
+  }
+  .jss172 {
+    flex-grow: 0;
+    max-width: 66.666667%;
+    flex-basis: 66.666667%;
+  }
+  .jss173 {
+    flex-grow: 0;
+    max-width: 75%;
+    flex-basis: 75%;
+  }
+  .jss174 {
+    flex-grow: 0;
+    max-width: 83.333333%;
+    flex-basis: 83.333333%;
+  }
+  .jss175 {
+    flex-grow: 0;
+    max-width: 91.666667%;
+    flex-basis: 91.666667%;
+  }
+  .jss176 {
+    flex-grow: 0;
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+}
+.jss216 {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  list-style: none;
+}
+.jss217 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.jss218 {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.jss219 {
+  padding-top: 0;
+}
+.jss220 {
+  width: 100%;
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  text-align: left;
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  justify-content: flex-start;
+  text-decoration: none;
+}
+.jss220.jss230, .jss220.jss230:hover {
+  background-color: rgba(0, 0, 0, 0.14);
+}
+.jss221 {
+  position: relative;
+}
+.jss222 {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.jss224 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.jss225 {
+  opacity: 0.5;
+}
+.jss226 {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  background-clip: padding-box;
+}
+.jss227 {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (min-width:600px) {
+  .jss227 {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+.jss228 {
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.jss228:hover {
+  text-decoration: none;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+@media (hover: none) {
+  .jss228:hover {
+    background-color: transparent;
+  }
+}
+.jss229 {
+  padding-right: 32px;
+}
+.jss231 {
+  flex: 1 1 auto;
+  padding: 0 16px;
+  min-width: 0;
+}
+.jss231:first-child {
+  padding-left: 0;
+}
+.jss232:first-child {
+  padding-left: 56px;
+}
+.jss233 {
+  font-size: 0.8125rem;
+}
+.jss234.jss236 {
+  font-size: inherit;
+}
+.jss235.jss236 {
+  font-size: inherit;
+}
+.jss54 {
+  color: rgba(0, 0, 0, 0.87);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  font-size: 0.875rem;
+  max-width: 264px;
+  min-width: 72px;
+  min-height: 48px;
+  font-weight: 500;
+  font-family: &quot;Roboto&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+  flex-shrink: 0;
+  white-space: normal;
+  text-transform: uppercase;
+}
+@media (min-width:960px) {
+  .jss54 {
+    font-size: 0.8125rem;
+    min-width: 160px;
+  }
+}
+.jss55 {
+  min-height: 72px;
+}
+.jss56 {
+  color: inherit;
+  opacity: 0.7;
+}
+.jss56.jss59 {
+  opacity: 1;
+}
+.jss56.jss60 {
+  opacity: 0.4;
+}
+.jss57 {
+  color: rgba(0, 0, 0, 0.54);
+}
+.jss57.jss59 {
+  color: #3f51b5;
+}
+.jss57.jss60 {
+  color: rgba(0, 0, 0, 0.38);
+}
+.jss58 {
+  color: rgba(0, 0, 0, 0.54);
+}
+.jss58.jss59 {
+  color: #f50057;
+}
+.jss58.jss60 {
+  color: rgba(0, 0, 0, 0.38);
+}
+.jss61 {
+  flex-grow: 1;
+  max-width: none;
+  flex-shrink: 1;
+}
+.jss62 {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.jss63 {
+  padding-top: 6px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: 6px;
+}
+@media (min-width:960px) {
+  .jss63 {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+@media (max-width:959.95px) {
+  .jss65 {
+    font-size: 0.75rem;
+  }
+}
+.jss41 {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+.jss42 {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (min-width:600px) {
+  .jss42 {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+.jss43 {
+  min-height: 56px;
+}
+@media (min-width:0px) and (orientation: landscape) {
+  .jss43 {
+    min-height: 48px;
+  }
+}
+@media (min-width:600px) {
+  .jss43 {
+    min-height: 64px;
+  }
+}
+.jss44 {
+  min-height: 48px;
+}
+.jss76 {
+  width: 100%;
+  height: 2px;
+  bottom: 0;
+  position: absolute;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  will-change: left, width;
+}
+.jss77 {
+  background-color: #3f51b5;
+}
+.jss78 {
+  background-color: #f50057;
+}
+.jss45 {
+  overflow: hidden;
+  min-height: 48px;
+  -webkit-overflow-scrolling: touch;
+}
+.jss46 {
+  display: flex;
+}
+.jss47 {
+  justify-content: center;
+}
+.jss48 {
+  flex: 1 1 auto;
+  display: inline-block;
+  position: relative;
+  white-space: nowrap;
+}
+.jss49 {
+  width: 100%;
+  overflow-x: hidden;
+}
+.jss50 {
+  overflow-x: scroll;
+}
+@media (max-width:599.95px) {
+  .jss52 {
+    display: none;
+  }
+}
+.jss2 {
+  border-bottom: 1px solid #e0e0e0;
+}
+.jss3 {
+  flex: 1;
+}
+.jss4 {
+  justify-content: space-between;
+}
+.jss1 {
+  margin-top: 1em;
+}
+.jss79 {
+  line-height: 1.5;
+}
+@media (min-width: 1024px) {
+  .jss79 {
+    padding-left: 2em;
+  }
+}</style><script type="text/javascript">window.__CSS_CHUNKS__ = {"src/containers/Post":"https://www.perlmint.app/src/containers/Post.e077ec7f4d96721ed2572ba17999438a.css","main":"https://www.perlmint.app/main.6eddb0f43dcfad7695c1769c56ed562a.css"}</script><script type="text/javascript">
+    window.__routeInfo = {"path":"blog/post/typescript_technic","templateID":3,"sharedPropsHashes":{},"localProps":null,"allProps":{"post":{"id":"typescript_technic","title":"Typescript의 타입 시스템을 활용하는 테크닉","date":"2019-02-25T06:58:00.000Z","categories":["software"],"tags":["typescript"],"body":"<p>이 글은 <a href=\"https://github.com/lacti/typescript-webworker-rpc\">Typescript WebWorker RPC</a>에 기여를 하면서 사용한 테크닉을 정리하는 글이다.\n여기에 정리하는 내용과 예시는 기여한 내용과 관련된 내용만을 다룬다.</p>\n<h2>특정 타입만을 멤버로 가지는 타입 조건</h2>\n<p>특정 타입만을 멤버로 가지는 타입 조건 자체는 기본적이며 단순하다. 우선 다음과 같은 형태로 표현이 가능하다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">class</span> <span class=\"token class-name\">RPC</span><span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span> <span class=\"token keyword\">extends</span> <span class=\"token punctuation\">{</span>\n    <span class=\"token punctuation\">[</span>key<span class=\"token punctuation\">:</span> <span class=\"token builtin\">string</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">:</span> <span class=\"token builtin\">Function</span><span class=\"token punctuation\">,</span>\n<span class=\"token punctuation\">}</span><span class=\"token operator\">></span> <span class=\"token punctuation\">{</span><span class=\"token punctuation\">}</span>\n</code></pre>\n<p>하지만 위와 같은 타입을 사용하면 Type literal에는 문제가 없으나 interface를 사용할 수 없다는 문제가 있다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token comment\">// correct!</span>\n<span class=\"token keyword\">const</span> rpc_with_type_literal <span class=\"token operator\">=</span> <span class=\"token keyword\">new</span> <span class=\"token class-name\">RPC</span><span class=\"token operator\">&lt;</span><span class=\"token punctuation\">{</span>\n    <span class=\"token function\">func</span><span class=\"token punctuation\">(</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">:</span> <span class=\"token keyword\">void</span><span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span><span class=\"token operator\">></span><span class=\"token punctuation\">(</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">;</span>\n\n<span class=\"token keyword\">interface</span> <span class=\"token class-name\">RPCDecl</span> <span class=\"token punctuation\">{</span>\n    <span class=\"token function\">func</span><span class=\"token punctuation\">(</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">:</span> <span class=\"token keyword\">void</span><span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span>\n\n<span class=\"token comment\">// error!</span>\n<span class=\"token keyword\">const</span> rpc_with_interface <span class=\"token operator\">=</span> <span class=\"token keyword\">new</span> <span class=\"token class-name\">RPC</span><span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token operator\">></span><span class=\"token punctuation\">(</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">;</span>\n</code></pre>\n<p>RPCDecl은 index operator에 동작을 안하니 쓸 수 없다는 에러가 발생하는데 이는 <code>[key: string]</code>이 가리키는 것이 RPCDecl의 키 보다 더 많기 때문이다.\n즉, 저 <code>key</code>가 가리키는 것을 제약을 걸어주면 되는데 정확히는 자기 자신이 가지고 있는 모든 키로 제약을 걸어주면 된다.\n<a href=\"https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern\">Curiosly recurring template pattern</a> 처럼 자기 자신의 타입을 참조하는 방식으로 다음과 같은 코드를 작성할 수 있고 사용에 있어서 원치 않는 제약을 피할 수 있다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">type</span> RPCDeclaration<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token operator\">></span> <span class=\"token operator\">=</span> <span class=\"token punctuation\">{</span> <span class=\"token punctuation\">[</span><span class=\"token constant\">K</span> <span class=\"token keyword\">in</span> keyof <span class=\"token constant\">RPC</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">:</span> AnyFunction <span class=\"token punctuation\">}</span><span class=\"token punctuation\">;</span>\n\n<span class=\"token keyword\">class</span> <span class=\"token class-name\">RPC</span><span class=\"token operator\">&lt;</span>RPCDecl <span class=\"token keyword\">extends</span> <span class=\"token class-name\">RPCDeclaration</span><span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token operator\">></span> <span class=\"token punctuation\">{</span><span class=\"token punctuation\">}</span>\n</code></pre>\n<h2>타입 안전한 여러 인자가 사용 가능한 proxy method</h2>\n<p>3.0에서 추가된 <a href=\"https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#generic-rest-parameters\">generic rest parameter</a>덕에 <code>bind</code>, <code>apply</code>와 같은 함수의 타입들에서도 타입 검사가 가능해졌다.\n그리고 <code>Parameter</code>, <code>ReturnType</code>과 같은 함수에 대한 상세한 타입 정보를 얻을 수 있는 기본 제공 타입이 여럿 추가 되었다.\n이를 사용하면 매우 간편하게 proxy method의 타입을 표현할 수 있다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">class</span> <span class=\"token class-name\">RPC</span><span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token operator\">></span> <span class=\"token punctuation\">{</span>\n  <span class=\"token keyword\">public</span> call<span class=\"token punctuation\">:</span> <span class=\"token operator\">&lt;</span><span class=\"token constant\">M</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">keyof</span> RPCDecl<span class=\"token operator\">></span><span class=\"token punctuation\">(</span>\n    method<span class=\"token punctuation\">:</span> <span class=\"token constant\">M</span><span class=\"token punctuation\">,</span>\n    <span class=\"token operator\">...</span>args<span class=\"token punctuation\">:</span> Parameters<span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span>\n  <span class=\"token punctuation\">)</span> <span class=\"token operator\">=></span> Promise<span class=\"token operator\">&lt;</span>ReturnType<span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">>></span><span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span><span class=\"token punctuation\">;</span>\n</code></pre>\n<p>RPCDecl에서는 Promise가 아니었던 리턴타입을 Promise로 변환하고, method 이름을 인자로 받고, 원래 인자들을 rest parameter로 표현할 수 있다.</p>\n<h2>phantom type을 활용한 method에 제약 걸기</h2>\n<p>phantom type은 실제 데이터 표현으로는 의미가 없는 정보를 타입에 넣는 것으로, 타입 시스템이 의미적인 검증을 할 수 있도록 사용할 수 있다.\ntypescript에서는 실제 표현하려는 타입에 <code>never</code> 타입인 멤버를 넣는 것으로 표현할 수 있으며, 캐스팅을 통해서 값이 해당 타입을 가지도록 한 후에 사용한다.</p>\n<p>여기서는 RPC의 정의에 post 프로시저와 call 프로시저를 phantom type을 통해서 구분하도록 하고, 각각의 프로시저에 대한 method인 <code>RPC.post</code>, <code>RPC.call</code> 중 매칭되는 것만을 호출할 수 있도록 제한하는데 사용했다.</p>\n<p>RPC 정의 타입은 타입 검사에서만 사용되고 실제로 구현을 하는 타입이 아닌만큼 phantom type을 조금 색다르게 사용 해 보았다.\n대부분의 경우 추가적인 태그가 달리기를 원하는 타입 자체를 phantom type으로 표현을 하겠으나, post 프로시저에 대응되는 interface method선언에서 리턴타입을 phantom type으로 대체를 하는 방법을 사용했다. 우선 post 프로시저는 리턴타입이 있으면 안된다는 제약조건이 있으며, 해당 타입을 직접 써야하는 곳이 없기 때문에 원하는 대로 대체해서 쓰기에 불편한 점이 없었다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">interface</span> <span class=\"token class-name\">PostReturn</span> <span class=\"token punctuation\">{</span>\n  __post__<span class=\"token punctuation\">:</span> never<span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span>\n\n<span class=\"token keyword\">interface</span> <span class=\"token class-name\">RPCDecl</span> <span class=\"token punctuation\">{</span>\n    <span class=\"token function\">someCallProcedure</span><span class=\"token punctuation\">(</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">:</span> <span class=\"token keyword\">void</span><span class=\"token punctuation\">;</span>\n    <span class=\"token function\">somePostProcedure</span><span class=\"token punctuation\">(</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">:</span> PostReturn<span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span>\n</code></pre>\n<p>위와 같이 리턴타입을 <code>PostReturn</code>으로 선언하는 것만으로 해당 프로시저가 post임을 표현할 수 있다.</p>\n<p>이제 저 정보를 사용해서 <code>RPC.post</code>, <code>RPC.call</code>에 사용할 수 있는 프로시저 종류에 제약을 걸어보자.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">type</span> PostMethodCondition<span class=\"token operator\">&lt;</span><span class=\"token constant\">FN</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">Function</span><span class=\"token punctuation\">,</span> <span class=\"token constant\">T</span><span class=\"token punctuation\">,</span> <span class=\"token constant\">F</span><span class=\"token operator\">></span> <span class=\"token operator\">=</span> ReturnType<span class=\"token operator\">&lt;</span><span class=\"token constant\">FN</span><span class=\"token operator\">></span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">PostReturn</span> <span class=\"token operator\">?</span> <span class=\"token constant\">T</span> <span class=\"token punctuation\">:</span> <span class=\"token constant\">F</span><span class=\"token punctuation\">;</span>\n\n<span class=\"token keyword\">type</span> CallMethodNames<span class=\"token operator\">&lt;</span>\n  <span class=\"token constant\">T</span> <span class=\"token keyword\">extends</span> <span class=\"token punctuation\">{</span> <span class=\"token punctuation\">[</span><span class=\"token constant\">K</span><span class=\"token punctuation\">:</span> <span class=\"token builtin\">string</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">:</span> <span class=\"token builtin\">Function</span> <span class=\"token punctuation\">}</span>\n  <span class=\"token operator\">></span> <span class=\"token operator\">=</span> <span class=\"token punctuation\">{</span>\n    <span class=\"token punctuation\">[</span><span class=\"token constant\">K</span> <span class=\"token keyword\">in</span> keyof <span class=\"token constant\">T</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">:</span> PostMethodCondition<span class=\"token operator\">&lt;</span><span class=\"token constant\">T</span><span class=\"token punctuation\">[</span><span class=\"token constant\">K</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">,</span> never<span class=\"token punctuation\">,</span> <span class=\"token constant\">K</span><span class=\"token operator\">></span>\n  <span class=\"token punctuation\">}</span><span class=\"token punctuation\">[</span>keyof <span class=\"token constant\">T</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">;</span>\n\n<span class=\"token keyword\">type</span> PostMethodNames<span class=\"token operator\">&lt;</span><span class=\"token constant\">T</span> <span class=\"token keyword\">extends</span> <span class=\"token punctuation\">{</span> <span class=\"token punctuation\">[</span><span class=\"token constant\">K</span><span class=\"token punctuation\">:</span> <span class=\"token builtin\">string</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">:</span> <span class=\"token builtin\">Function</span> <span class=\"token punctuation\">}</span><span class=\"token operator\">></span> <span class=\"token operator\">=</span> Exclude<span class=\"token operator\">&lt;</span>keyof <span class=\"token constant\">T</span><span class=\"token punctuation\">,</span> CallMethodNames<span class=\"token operator\">&lt;</span><span class=\"token constant\">T</span><span class=\"token operator\">>></span><span class=\"token punctuation\">;</span>\n</code></pre>\n<p>우선 RPCDecl의 키 메소드 이름 중에서 <code>ReturnType</code>이 <code>PostReturn</code>인 것만을 골라내는 것으로 call 프로시저와 post 프로시저의 이름 타입을 추출할 수 있다.\n타입을 필터링하는 <code>PostMethodCondition</code>은 2.8에서 추가된 <a href=\"https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#conditional-types\">Conditional Type</a>을 사용해서 표현할 수 있다.</p>\n<p>각각의 method에 다음과 같이 기준이 되는 값의 제약인 키를 기존의 <code>keyof RPCDecl</code> 대신에 더 좁은 범위의 타입으로 변경하는 것으로 <code>method</code> 값에 따라서 해당 method를 호출하려고 할 때 타입 검사를 할 수 있다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">class</span> <span class=\"token class-name\">RPC</span><span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token operator\">></span> <span class=\"token punctuation\">{</span>\n    <span class=\"token keyword\">public</span> post<span class=\"token punctuation\">:</span> <span class=\"token operator\">&lt;</span><span class=\"token constant\">M</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">PostMethodNames</span><span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token operator\">>></span><span class=\"token punctuation\">(</span>\n        method<span class=\"token punctuation\">:</span> <span class=\"token constant\">M</span><span class=\"token punctuation\">,</span>\n        <span class=\"token operator\">...</span>args<span class=\"token punctuation\">:</span> Parameters<span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span>\n    <span class=\"token punctuation\">)</span> <span class=\"token operator\">=></span> <span class=\"token keyword\">void</span><span class=\"token punctuation\">;</span>\n\n    <span class=\"token keyword\">public</span> call<span class=\"token punctuation\">:</span> <span class=\"token operator\">&lt;</span><span class=\"token constant\">M</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">CallMethodNames</span><span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token operator\">>></span><span class=\"token punctuation\">(</span>\n        method<span class=\"token punctuation\">:</span> <span class=\"token constant\">M</span><span class=\"token punctuation\">,</span>\n        <span class=\"token operator\">...</span>args<span class=\"token punctuation\">:</span> Parameters<span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span>\n    <span class=\"token punctuation\">)</span> <span class=\"token operator\">=></span> Promise<span class=\"token operator\">&lt;</span>ReturnType<span class=\"token operator\">&lt;</span>RPCDecl<span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">>></span><span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span><span class=\"token punctuation\">;</span>\n</code></pre>\n<h2>Conditional type으로 표현한 함수에서 조건에 따른 optional인자 받기</h2>\n<p>conditional type으로 함수의 인자를 optional로 하고 싶더라도 인자가 optional로 지정되어있지 않으면 호출 할 때 꼭 값을 명시해줘야 한다. 심지어 undefined여도 말이다. never인 경우에는 넣을 평범한 방법이 없으니 타입 오류 없이 호출이 불가능해져버린다. 그렇다고 인자를 optional로 지정하면 optional이 아닌 경우에도 optional일 수 밖에 없는 문제가 있다.</p>\n<p>즉, overload로 함수를 표현해줘서 optional인 경우는 optional로 표현을 해줄 수 밖에 없다.</p>\n<p>현재 arrow function에 대해서는 overload를 지원하지 않는 것 같으므로 별도의 interface로 overload 타입을 선언하고 arrow function을 대입하는 방법으로 해결을 했다.</p>\n<pre class=\"language-typescript\"><code class=\"language-typescript\"><span class=\"token keyword\">type</span> RPCHandlerRType<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">AnyFunction</span><span class=\"token operator\">></span> <span class=\"token operator\">=</span> ReturnType<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span><span class=\"token operator\">></span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">void</span> <span class=\"token operator\">?</span> <span class=\"token punctuation\">(</span><span class=\"token keyword\">void</span> <span class=\"token operator\">|</span> <span class=\"token punctuation\">{</span> result<span class=\"token operator\">?</span><span class=\"token punctuation\">:</span> never<span class=\"token punctuation\">,</span> transfer<span class=\"token punctuation\">:</span> Transferable<span class=\"token punctuation\">[</span><span class=\"token punctuation\">]</span> <span class=\"token punctuation\">}</span><span class=\"token punctuation\">)</span> <span class=\"token punctuation\">:</span> <span class=\"token punctuation\">{</span>\n  result<span class=\"token punctuation\">:</span> ReturnType<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span><span class=\"token operator\">></span><span class=\"token punctuation\">;</span>\n  transfer<span class=\"token operator\">?</span><span class=\"token punctuation\">:</span> Transferable<span class=\"token punctuation\">[</span><span class=\"token punctuation\">]</span><span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span><span class=\"token punctuation\">;</span>\n<span class=\"token keyword\">type</span> RPCHandler<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">AnyFunction</span><span class=\"token operator\">></span> <span class=\"token operator\">=</span> <span class=\"token punctuation\">(</span>\n  <span class=\"token operator\">...</span>args<span class=\"token punctuation\">:</span> Parameters<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span><span class=\"token operator\">></span>\n<span class=\"token punctuation\">)</span> <span class=\"token operator\">=></span> PromiseOrValue<span class=\"token operator\">&lt;</span>PostMethodCondition<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span><span class=\"token punctuation\">,</span> <span class=\"token keyword\">void</span><span class=\"token punctuation\">,</span> RPCHandlerRType<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span><span class=\"token operator\">>>></span><span class=\"token punctuation\">;</span>\n<span class=\"token keyword\">interface</span> <span class=\"token class-name\">PostRPCHandlerOptions</span> <span class=\"token punctuation\">{</span>\n  noReturn<span class=\"token punctuation\">:</span> <span class=\"token boolean\">true</span><span class=\"token punctuation\">;</span>\n<span class=\"token punctuation\">}</span>\n\n<span class=\"token keyword\">type</span> CallRPCHandlerOptions <span class=\"token operator\">=</span> never<span class=\"token punctuation\">;</span>\n\n<span class=\"token keyword\">type</span> RPCHandlerOptions<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">AnyFunction</span><span class=\"token operator\">></span> <span class=\"token operator\">=</span> PostMethodCondition<span class=\"token operator\">&lt;</span><span class=\"token constant\">F</span><span class=\"token punctuation\">,</span> PostRPCHandlerOptions<span class=\"token punctuation\">,</span> CallRPCHandlerOptions<span class=\"token operator\">></span><span class=\"token punctuation\">;</span>\n\n<span class=\"token keyword\">interface</span> <span class=\"token class-name\">RPCServerOnMethod</span><span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">RPCDeclaration</span><span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token operator\">>></span> <span class=\"token punctuation\">{</span>\n  <span class=\"token operator\">&lt;</span><span class=\"token constant\">M</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">CallMethodNames</span><span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token operator\">>></span><span class=\"token punctuation\">(</span>\n    method<span class=\"token punctuation\">:</span> <span class=\"token constant\">M</span><span class=\"token punctuation\">,</span>\n    handler<span class=\"token punctuation\">:</span> RPCHandler<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span><span class=\"token punctuation\">,</span>\n    options<span class=\"token operator\">?</span><span class=\"token punctuation\">:</span> RPCHandlerOptions<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span><span class=\"token punctuation\">,</span>\n  <span class=\"token punctuation\">)</span><span class=\"token punctuation\">:</span> RPCServer<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token operator\">></span><span class=\"token punctuation\">,</span>\n  <span class=\"token operator\">&lt;</span><span class=\"token constant\">M</span> <span class=\"token keyword\">extends</span> <span class=\"token class-name\">PostMethodNames</span><span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token operator\">>></span><span class=\"token punctuation\">(</span>\n    method<span class=\"token punctuation\">:</span> <span class=\"token constant\">M</span><span class=\"token punctuation\">,</span>\n    handler<span class=\"token punctuation\">:</span> RPCHandler<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span><span class=\"token punctuation\">,</span>\n    options<span class=\"token punctuation\">:</span> RPCHandlerOptions<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token punctuation\">[</span><span class=\"token constant\">M</span><span class=\"token punctuation\">]</span><span class=\"token operator\">></span><span class=\"token punctuation\">,</span>\n  <span class=\"token punctuation\">)</span><span class=\"token punctuation\">:</span> RPCServer<span class=\"token operator\">&lt;</span><span class=\"token constant\">RPC</span><span class=\"token operator\">></span><span class=\"token punctuation\">,</span>\n<span class=\"token punctuation\">}</span>\n</code></pre>\n<p>앞서 phantom type과 mapped type을 사용하여 여러 메소드에 각각 타입 조건을 건 것을 이번에는 overload 타입을 표현하는데 사용했다.</p>\n"}},"siteData":{"title":"Perlmint"}};</script><script defer="" type="text/javascript" src="https://www.perlmint.app/bootstrap.aefbadb1.js"></script><script defer="" type="text/javascript" src="https://www.perlmint.app/templates/src/containers/Post.5a0bce5d.js"></script><script defer="" type="text/javascript" src="https://www.perlmint.app/main.7e6329eb.js"></script></body></html>

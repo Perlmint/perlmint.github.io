@@ -6,19 +6,21 @@ before_install:
 install:
 - npm ci
 script: |
-  npm run build &&
-  chmod 600 .travis/deploy_key.pem &&
-  eval `ssh-agent -s` &&
-  ssh-add .travis/deploy_key.pem &&
-  git config user.email "omniavinco@gmail.com" &&
-  git config user.name "Gyusun Yeom" &&
-  git config push.default simple &&
-  git remote add deploy git@github.com:Perlmint/perlmint.github.io.git &&
-  git fetch deploy &&
-  git checkout -b master deploy/master  || git checkout --orphan master &&
-  git reset &&
-  find . -maxdepth 1 ! -name "dist" ! -name .git ! -name CNAME ! -path . -exec git rm --ignore-unmatch -q -r -f {} \; -exec rm -rf {} \; &&
-  mv dist/* . &&
-  rm -rf dist &&
-  git add * &&
-  if [ `git diff --cached | wc -l` -ne 0 ] ; then  git commit -m"Static page generated" && git push -f deploy;
+  npm run build || exit
+  chmod 600 .travis/deploy_key.pem
+  eval `ssh-agent -s`
+  ssh-add .travis/deploy_key.pem
+  git config user.email "omniavinco@gmail.com"
+  git config user.name "Gyusun Yeom"
+  git config push.default simple
+  git remote add deploy git@github.com:Perlmint/perlmint.github.io.git
+  git fetch deploy
+  git checkout -b master deploy/master || git checkout --orphan master
+  git reset
+  find . -maxdepth 1 ! -name "dist" ! -name .git ! -name CNAME ! -path . -exec git rm --ignore-unmatch -q -r -f {} \; -exec rm -rf {} \;
+  mv dist/* .
+  rm -rf dist
+  git add *
+  if [ `git diff --cached | wc -l` -ne 0 ]; then
+    git commit -m"Static page generated" && git push -f deploy;
+  fi

@@ -37,6 +37,9 @@ export default withStyles(styles)(withRouteData(({ post, classes }: IProps & Wit
       <Paper style={{ padding: '2em', }}>
         <Head>
           <title>{post.title}</title>
+          <meta name='keywords' content={post.tags.join(',')} />
+          <meta name='twitter:card' content='summary' />
+          <meta name='twitter:title' content={post.title} />
         </Head>
         <div style={{ flexDirection: 'row', display: 'flex', }}>
           <div>
